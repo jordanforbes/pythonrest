@@ -14,12 +14,19 @@ def test_client():
       yield testing_client
       db.drop_all()
 
+# Test Case 1: does registration work?
 def test_register(test_client):
-  # print(f"testclient: {test_client}")
   response = test_client.post('/register', json={'username': 'testuser', 'password':'testpassword'})
-  # print(f"response: {response}")
-  # print(f"status code: {response.status_code}")
-  # print(f"get_json: {response.get_json()}")
+
   assert response.status_code == 201
   assert response.get_json() == {"msg":"User registered"}
+
+# Test Case 2: can all users be returned?
+def test_showall(test_client):
+  test_client.post('/register', json={'username': 'testuser', 'password':'testpassword'})
+  test_client.post('/register', json={'username': 'foo', 'password':'barbaz'})
+
+  response = test_client.get('/showall')
+  assert response.status_code == 200
+  assert response.get_json() == [{'username': 'testuser', 'password':'testpassword'}, {'username': 'foo', 'password':'barbaz'}]
 
