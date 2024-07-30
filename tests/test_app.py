@@ -34,17 +34,27 @@ def test_showall(test_client):
 # Test Case 3: can password be edited?
 def test_update_password(test_client):
     # Register a user
-    test_client.post('/register', json={'username': 'testuser', 'password': 'testpassword'})
+    register_response = test_client.post('/register', json={'username': 'newuser', 'password': 'oldpw'})
+    assert register_response.status_code == 201
+    assert register_response.get_json() == {"msg" : "User registered"}
+
+    # verify user's registration
+    user = User.query.filter_by(username='newuser').first()
+    assert user is not None
+    # get user id
+    user_id = user.id
+    assert user.username == 'newuser'
+    assert user.password == 'oldpw'
 
     # Update the user's password
     response = test_client.put('/update_password', json={
-        'username': 'testuser',
-        'old_password': 'testpassword',
+        'id': user_id,
+        'old_password': 'oldpw',
         'new_password': 'newpassword123'
     })
     assert response.status_code == 200
     assert response.get_json() == {'msg': 'Password updated successfully'}
 
     # Verify the password was updated by trying to get user details (adjust as per your routes)
-    user = User.query.filter_by(username='testuser').first()
-    assert user.password == 'newpassword123'
+    updated_user = User.query.get(user_id)
+    assert updated_user.password == 'newpassword123'

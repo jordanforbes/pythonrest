@@ -13,6 +13,7 @@ def home():
 # create user
 @main.route('/register', methods = ['POST'])
 def register():
+
   data = request.get_json()
 
   username = data.get('username')
@@ -22,6 +23,7 @@ def register():
     return jsonify({"msg": "Missing username or password"}), 400
 
   if User.query.filter_by(username=username).first():
+    print('this hits')
     return jsonify({"msg":"Username already exists"}),400
 
   user = User(username=username, password=password)
@@ -46,7 +48,7 @@ def update_password():
   data = request.get_json()
   # print(f'recieved data {data}')
 
-  username = data.get('username')
+  user_id = data.get('id')
   old_password = data.get('old_password')
   new_password = data.get('new_password')
 
@@ -55,19 +57,19 @@ def update_password():
   # print(f'old_password: {old_password}')
 
   # validate input
-  if not username:
-    print('no username')
+  if not user_id:
+    print('no user_id')
   if not old_password:
     print('no old password')
   if not new_password:
     print('no new password')
 
-  if not username or not old_password or not new_password:
-    # print('missing username, old password, or new password')
+  if not user_id or not old_password or not new_password:
+    print('missing username, old password, or new password')
     return jsonify({"msg": "Missing username, old password, or new password"}), 400
 
   # find user by username
-  user = User.query.filter_by(username=username).first()
+  user = User.query.filter_by(id=user_id).first()
 
   if not user:
     # print('not user')
@@ -75,7 +77,7 @@ def update_password():
 
   # check if old password is correct
   if user.password != old_password:
-    # print('wrong old password')
+    print('wrong old password')
     return jsonify({"msg": "incorrect old password"}), 400
 
   # update user's password
