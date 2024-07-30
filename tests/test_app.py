@@ -15,6 +15,11 @@ def test_client():
       db.drop_all()
 
 def test_register(test_client):
+  # print(f"testclient: {test_client}")
   response = test_client.post('/register', json={'username': 'testuser', 'password':'testpassword'})
+  # print(f"response: {response}")
+  # print(f"status code: {response.status_code}")
+  # print(f"get_json: {response.get_json()}")
   assert response.status_code == 201
-  assert response.get_json() == {'msg':'User registered'}
+  assert response.get_json() == {"msg":"User registered"}
+
