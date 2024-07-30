@@ -4,10 +4,12 @@ from .models import User
 
 main = Blueprint('main', __name__)
 
+# ////////////////////////////////////
 @main.route('/')
 def home():
   return jsonify(message='Hello world')
 
+# ////////////////////////////////////
 # create user
 @main.route('/register', methods = ['POST'])
 def register():
@@ -28,6 +30,7 @@ def register():
 
   return jsonify({"msg":"User registered"}), 201
 
+# ////////////////////////////////////
 # get all users
 @main.route('/showall', methods = ['GET'])
 def showall():
@@ -36,28 +39,46 @@ def showall():
   print(f'users list: {users_list}')
   return jsonify(users_list), 200
 
+# ////////////////////////////////////
 # edit user's password
 @main.route('/update_password', methods=['PUT'])
 def update_password():
   data = request.get_json()
+  # print(f'recieved data {data}')
+
   username = data.get('username')
   old_password = data.get('old_password')
   new_password = data.get('new_password')
 
+  # print(f'username: {username}')
+  # print(f'new_password: {new_password}')
+  # print(f'old_password: {old_password}')
+
   # validate input
-  if not username or old_password or not new_password:
+  if not username:
+    print('no username')
+  if not old_password:
+    print('no old password')
+  if not new_password:
+    print('no new password')
+
+  if not username or not old_password or not new_password:
+    # print('missing username, old password, or new password')
     return jsonify({"msg": "Missing username, old password, or new password"}), 400
 
   # find user by username
   user = User.query.filter_by(username=username).first()
 
   if not user:
+    # print('not user')
     return jsonify({"msg": "User not found"}), 404
 
   # check if old password is correct
   if user.password != old_password:
+    # print('wrong old password')
     return jsonify({"msg": "incorrect old password"}), 400
 
+  # update user's password
   user.password = new_password
   db.session.commit()
 
