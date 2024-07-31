@@ -32,9 +32,9 @@ def test_showall(test_client):
   test_client.post('/register', json={'username': 'testuser', 'password':'testpassword'})
   test_client.post('/register', json={'username': 'foo', 'password':'barbaz'})
 
-  response = test_client.get('/showall')
+  response = test_client.get('/users')
   # assert response.status_code == 200
-  assert response.get_json() == [{'username': 'testuser', 'password':'testpassword'}, {'username': 'foo', 'password':'barbaz'}]
+  assert response.get_json() == [{'username': 'testuser'}, {'username': 'foo'}]
 
 
 # Test Case 3: can password be edited by id?
@@ -50,7 +50,7 @@ def test_update_password(test_client):
     # get user id
     user_id = user.id
     assert user.username == 'newuser'
-    assert user.password == 'oldpw'
+    assert user.check_password('oldpw')
 
     # Update the user's password
     response = test_client.put('/update_password', json={
@@ -63,30 +63,45 @@ def test_update_password(test_client):
 
     # Verify the password was updated by trying to get user details (adjust as per your routes)
     updated_user = db.session.get(User, user_id)
-    assert updated_user.password == 'newpassword123'
+    assert updated_user.check_password('newpassword123')
 
 # Test Case 4: get individual user by id
 def test_get_user_by_id(test_client):
   # create dummy users
   register_response = test_client.post('/register', json={'username':'test1','password':'pw1'})
-  # register_response = register_user('testname1', 'testpw1')
+  register_response2 = test_client.post('/register', json={'username':'test2','password':'pw2'})
+
   assert register_response.status_code == 201
   assert register_response.get_json() == {"msg" : "User registered"}
 
+  assert register_response2.status_code == 201
+  assert register_response2.get_json() == {"msg" : "User registered"}
+
   # Verify registration and get Id
   user = User.query.filter_by(username='test1').first()
-  print(user.id)
   user_id = user.id
-  print(user_id)
   assert user.username == 'test1'
-  assert user.password == 'pw1'
+  assert user.check_password('pw1')
 
-  # fetch user by id
-  id_response = test_client.get(f'/user/{user_id}')
+  user2 = User.query.filter_by(username='test2').first()
+  user2_id = user2.id
+  assert user2.username == 'test2'
+  assert user2.check_password('pw2')
+
+  assert user != user2
+
+  # fetch users by id
+  id_response = test_client.get(f'/users/{user_id}')
   assert id_response.status_code == 200
   data = id_response.get_json()
   assert data['id'] == user_id
   assert data['username'] == 'test1'
-  assert data['password'] == 'pw1'
+
+  id_response2 = test_client.get(f'/users/{user2_id}')
+  assert id_response2.status_code == 200
+  data2 = id_response2.get_json()
+  assert data2['id'] == user2_id
+  assert data2['username'] == 'test2'
+
 
 

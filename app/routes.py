@@ -24,10 +24,10 @@ def register():
     return jsonify({"msg": "Missing username or password"}), 400
 
   if User.query.filter_by(username=username).first():
-    print('this hits')
     return jsonify({"msg":"Username already exists"}),400
 
-  user = User(username=username, password=password)
+  user = User(username=username)
+  user.set_password(password)
   db.session.add(user)
   db.session.commit()
 
@@ -35,61 +35,16 @@ def register():
 
 # ////////////////////////////////////
 # get all users
-@main.route('/showall', methods = ['GET'])
+@main.route('/users', methods = ['GET'])
 def showall():
   users = User.query.all()
-  users_list =  [{"username": user.username, "password": user.password} for user in users]
+  users_list =  [{"username": user.username} for user in users]
   print(f'users list: {users_list}')
   return jsonify(users_list), 200
 
 # ////////////////////////////////////
-# edit user's password by id
-@main.route('/update_password', methods=['PUT'])
-def update_password():
-  data = request.get_json()
-  # print(f'recieved data {data}')
-
-  user_id = data.get('id')
-  old_password = data.get('old_password')
-  new_password = data.get('new_password')
-
-  # print(f'username: {username}')
-  # print(f'new_password: {new_password}')
-  # print(f'old_password: {old_password}')
-
-  # validate input
-  if not user_id:
-    print('no user_id')
-  if not old_password:
-    print('no old password')
-  if not new_password:
-    print('no new password')
-
-  if not user_id or not old_password or not new_password:
-    print('missing username, old password, or new password')
-    return jsonify({"msg": "Missing username, old password, or new password"}), 400
-
-  # find user by username
-  user = User.query.filter_by(id=user_id).first()
-
-  if not user:
-    # print('not user')
-    return jsonify({"msg": "User not found"}), 404
-
-  # check if old password is correct
-  if user.password != old_password:
-    print('wrong old password')
-    return jsonify({"msg": "incorrect old password"}), 400
-
-  # update user's password
-  user.password = new_password
-  db.session.commit()
-
-  return jsonify({"msg": "Password updated successfully"}), 200
-
-# ////////////////////////////////////
-# get user by
-@main.route('/user/<int:user_id>', methods=['GET'])
+# get individual user by id
+@main.route('/users/<int:user_id>', methods=['GET'])
 def get_user_by_id(user_id):
   user = db.session.get(User, user_id)
   print('hello')
@@ -101,5 +56,35 @@ def get_user_by_id(user_id):
   return jsonify({
     "id": user.id,
     "username": user.username,
-    "password": user.password
   }), 200
+
+# ////////////////////////////////////
+# edit user's password by id
+@main.route('/update_password', methods=['PUT'])
+def update_password():
+  data = request.get_json()
+
+  user_id = data.get('id')
+  old_password = data.get('old_password')
+  new_password = data.get('new_password')
+
+  # validate input
+  if not user_id or not old_password or not new_password:
+    print('missing username, old password, or new password')
+    return jsonify({"msg": "Missing username, old password, or new password"}), 400
+
+  # find user by username
+  user = User.query.filter_by(id=user_id).first()
+
+  if not user:
+    return jsonify({"msg": "User not found"}), 404
+
+  if not user.check_password(old_password):
+    return jsonify({'msg':'incorrect old password'}), 404
+
+  # update user's password
+  user.set_password(new_password)
+  db.session.commit()
+
+  return jsonify({"msg": "Password updated successfully"}), 200
+
