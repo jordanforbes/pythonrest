@@ -5,6 +5,7 @@ from .models import User
 main = Blueprint('main', __name__)
 
 # ////////////////////////////////////
+# home route
 @main.route('/')
 def home():
   return jsonify(message='Hello world')
@@ -42,7 +43,7 @@ def showall():
   return jsonify(users_list), 200
 
 # ////////////////////////////////////
-# edit user's password
+# edit user's password by id
 @main.route('/update_password', methods=['PUT'])
 def update_password():
   data = request.get_json()
@@ -85,3 +86,20 @@ def update_password():
   db.session.commit()
 
   return jsonify({"msg": "Password updated successfully"}), 200
+
+# ////////////////////////////////////
+# get user by
+@main.route('/user/<int:user_id>', methods=['GET'])
+def get_user_by_id(user_id):
+  user = db.session.get(User, user_id)
+  print('hello')
+  print(user)
+
+  if not user:
+    return jsonify({"msg":"user not found"}), 404
+
+  return jsonify({
+    "id": user.id,
+    "username": user.username,
+    "password": user.password
+  }), 200

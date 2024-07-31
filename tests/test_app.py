@@ -2,6 +2,12 @@ import pytest
 from app import create_app, db
 from app.models import User
 
+# def register_user(username: str, password: str):
+#   return test_client.post('/register', json={
+#     'username': username,
+#     'password': password}
+#   )
+
 @pytest.fixture(scope='module')
 def test_client():
   app = create_app()
@@ -31,7 +37,7 @@ def test_showall(test_client):
   assert response.get_json() == [{'username': 'testuser', 'password':'testpassword'}, {'username': 'foo', 'password':'barbaz'}]
 
 
-# Test Case 3: can password be edited?
+# Test Case 3: can password be edited by id?
 def test_update_password(test_client):
     # Register a user
     register_response = test_client.post('/register', json={'username': 'newuser', 'password': 'oldpw'})
@@ -56,5 +62,31 @@ def test_update_password(test_client):
     assert response.get_json() == {'msg': 'Password updated successfully'}
 
     # Verify the password was updated by trying to get user details (adjust as per your routes)
-    updated_user = User.query.get(user_id)
+    updated_user = db.session.get(User, user_id)
     assert updated_user.password == 'newpassword123'
+
+# Test Case 4: get individual user by id
+def test_get_user_by_id(test_client):
+  # create dummy users
+  register_response = test_client.post('/register', json={'username':'test1','password':'pw1'})
+  # register_response = register_user('testname1', 'testpw1')
+  assert register_response.status_code == 201
+  assert register_response.get_json() == {"msg" : "User registered"}
+
+  # Verify registration and get Id
+  user = User.query.filter_by(username='test1').first()
+  print(user.id)
+  user_id = user.id
+  print(user_id)
+  assert user.username == 'test1'
+  assert user.password == 'pw1'
+
+  # fetch user by id
+  id_response = test_client.get(f'/user/{user_id}')
+  assert id_response.status_code == 200
+  data = id_response.get_json()
+  assert data['id'] == user_id
+  assert data['username'] == 'test1'
+  assert data['password'] == 'pw1'
+
+
