@@ -33,7 +33,7 @@ def test_showall(test_client):
   test_client.post('/register', json={'username': 'foo', 'password':'barbaz'})
 
   response = test_client.get('/users')
-  # assert response.status_code == 200
+  assert response.status_code == 200
   assert response.get_json() == [{'username': 'testuser'}, {'username': 'foo'}]
 
 
@@ -103,5 +103,20 @@ def test_get_user_by_id(test_client):
   assert data2['id'] == user2_id
   assert data2['username'] == 'test2'
 
+# Test Case 5: delete user by id
+def test_delete_user_by_id(test_client):
+   # Register a user
+    response = test_client.post('/register', json={'username': 'testuser1', 'password': 'testpassword1'})
+    assert response.status_code == 201
 
+    # Fetch the user by username to get the user ID
+    user = User.query.filter_by(username='testuser1').first()
+    user_id = user.id
 
+    # delete user
+    delete_response = test_client.delete(f'user/{user_id}')
+    assert delete_response.status_code == 200
+    assert delete_response.get_json({"msg":"user deleted"})
+
+    deleted_user = User.query.get(user_id)
+    assert deleted_user is None

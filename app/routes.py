@@ -88,3 +88,15 @@ def update_password():
 
   return jsonify({"msg": "Password updated successfully"}), 200
 
+# ////////////////////////////////////
+# delete a user by id
+@main.route('/user/<int:user_id>', methods = ['DELETE'])
+def delete_user_by_id(user_id):
+  user = User.query.get(user_id)
+  if not user:
+    return jsonify({"msg" : "user not found"}), 404
+
+  db.session.delete(user)
+  db.session.commit()
+
+  return jsonify({"msg" : "user deleted"}), 200
