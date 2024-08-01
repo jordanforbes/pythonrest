@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from .extensions import db
 from .models.User import User
+from .models.Post import Post
 
 main = Blueprint('main', __name__)
 

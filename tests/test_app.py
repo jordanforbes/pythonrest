@@ -18,7 +18,7 @@ def test_client():
 # //////////////////////////////////////////////////////////////////
 # Test Case 1: does registration work?
 def test_register(test_client):
-  response = test_client.post('/register', json={'username': 'testuser', 'password':'testpassword'})
+  response = test_client.post('/api/register', json={'username': 'testuser', 'password':'testpassword'})
 
   assert response.status_code == 201
   assert response.get_json() == {"msg":"User registered"}
@@ -26,10 +26,10 @@ def test_register(test_client):
 # //////////////////////////////////////////////////////////////////
 # Test Case 2: can all users be returned?
 def test_showall(test_client):
-  test_client.post('/register', json={'username': 'testuser', 'password':'testpassword'})
-  test_client.post('/register', json={'username': 'foo', 'password':'barbaz'})
+  test_client.post('/api/register', json={'username': 'testuser', 'password':'testpassword'})
+  test_client.post('/api/register', json={'username': 'foo', 'password':'barbaz'})
 
-  response = test_client.get('/users')
+  response = test_client.get('/api/users')
   assert response.status_code == 200
   assert response.get_json() == [{'username': 'testuser'}, {'username': 'foo'}]
 
@@ -38,7 +38,7 @@ def test_showall(test_client):
 # Test Case 3: can password be edited by id?
 def test_update_password(test_client):
     # Register a user
-    register_response = test_client.post('/register', json={'username': 'newuser', 'password': 'oldpw'})
+    register_response = test_client.post('/api/register', json={'username': 'newuser', 'password': 'oldpw'})
     assert register_response.status_code == 201
     assert register_response.get_json() == {"msg" : "User registered"}
 
@@ -51,7 +51,7 @@ def test_update_password(test_client):
     assert user.check_password('oldpw')
 
     # Update the user's password
-    response = test_client.put('/update_password', json={
+    response = test_client.put('/api/update_password', json={
         'id': user_id,
         'old_password': 'oldpw',
         'new_password': 'newpassword123'
@@ -67,8 +67,8 @@ def test_update_password(test_client):
 # Test Case 4: get individual user by id
 def test_get_user_by_id(test_client):
   # create dummy users
-  register_response = test_client.post('/register', json={'username':'test1','password':'pw1'})
-  register_response2 = test_client.post('/register', json={'username':'test2','password':'pw2'})
+  register_response = test_client.post('/api/register', json={'username':'test1','password':'pw1'})
+  register_response2 = test_client.post('/api/register', json={'username':'test2','password':'pw2'})
 
   assert register_response.status_code == 201
   assert register_response.get_json() == {"msg" : "User registered"}
@@ -90,13 +90,13 @@ def test_get_user_by_id(test_client):
   assert user != user2
 
   # fetch users by id
-  id_response = test_client.get(f'/users/{user_id}')
+  id_response = test_client.get(f'/api/users/{user_id}')
   assert id_response.status_code == 200
   data = id_response.get_json()
   assert data['id'] == user_id
   assert data['username'] == 'test1'
 
-  id_response2 = test_client.get(f'/users/{user2_id}')
+  id_response2 = test_client.get(f'/api/users/{user2_id}')
   assert id_response2.status_code == 200
   data2 = id_response2.get_json()
   assert data2['id'] == user2_id
@@ -106,7 +106,7 @@ def test_get_user_by_id(test_client):
 # Test Case 5: delete user by id
 def test_delete_user_by_id(test_client):
    # Register a user
-    response = test_client.post('/register', json={'username': 'testuser1', 'password': 'testpassword1'})
+    response = test_client.post('/api/register', json={'username': 'testuser1', 'password': 'testpassword1'})
     assert response.status_code == 201
 
     # Fetch the user by username to get the user ID
@@ -114,7 +114,7 @@ def test_delete_user_by_id(test_client):
     user_id = user.id
 
     # delete user
-    delete_response = test_client.delete(f'user/{user_id}')
+    delete_response = test_client.delete(f'/api/user/{user_id}')
     assert delete_response.status_code == 200
     assert delete_response.get_json({"msg":"user deleted"})
 

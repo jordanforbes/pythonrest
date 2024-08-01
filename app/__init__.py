@@ -1,3 +1,4 @@
+# app
 from flask import Flask
 from flask_migrate import Migrate
 from .routes import main
@@ -12,11 +13,12 @@ def create_app():
   db.init_app(app)
   migrate.init_app(app, db)
 
-  app.register_blueprint(main)
+  from .routes import register_blueprints
+  register_blueprints(app)
 
   # Import models to register them with SQLAlchemy
   with app.app_context():
-    from .models import User
+    from .models import User, Post
     db.create_all()
 
   return app
