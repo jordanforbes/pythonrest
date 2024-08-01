@@ -5,12 +5,6 @@ from ..models.User import User
 user_bp = Blueprint('user_bp', __name__)
 
 # ////////////////////////////////////
-# home route
-# @user_bp.route('/')
-# def home():
-#   return jsonify(message='Hello world')
-
-# ////////////////////////////////////
 # create user
 @user_bp.route('/register', methods = ['POST'])
 def register():
