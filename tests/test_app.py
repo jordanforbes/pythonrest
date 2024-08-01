@@ -2,11 +2,6 @@ import pytest
 from app import create_app, db
 from app.models import User
 
-# def register_user(username: str, password: str):
-#   return test_client.post('/register', json={
-#     'username': username,
-#     'password': password}
-#   )
 
 @pytest.fixture(scope='module')
 def test_client():
@@ -20,6 +15,7 @@ def test_client():
       yield testing_client
       db.drop_all()
 
+# //////////////////////////////////////////////////////////////////
 # Test Case 1: does registration work?
 def test_register(test_client):
   response = test_client.post('/register', json={'username': 'testuser', 'password':'testpassword'})
@@ -27,6 +23,7 @@ def test_register(test_client):
   assert response.status_code == 201
   assert response.get_json() == {"msg":"User registered"}
 
+# //////////////////////////////////////////////////////////////////
 # Test Case 2: can all users be returned?
 def test_showall(test_client):
   test_client.post('/register', json={'username': 'testuser', 'password':'testpassword'})
@@ -37,6 +34,7 @@ def test_showall(test_client):
   assert response.get_json() == [{'username': 'testuser'}, {'username': 'foo'}]
 
 
+# //////////////////////////////////////////////////////////////////
 # Test Case 3: can password be edited by id?
 def test_update_password(test_client):
     # Register a user
@@ -65,6 +63,7 @@ def test_update_password(test_client):
     updated_user = db.session.get(User, user_id)
     assert updated_user.check_password('newpassword123')
 
+# //////////////////////////////////////////////////////////////////
 # Test Case 4: get individual user by id
 def test_get_user_by_id(test_client):
   # create dummy users
@@ -103,6 +102,7 @@ def test_get_user_by_id(test_client):
   assert data2['id'] == user2_id
   assert data2['username'] == 'test2'
 
+# //////////////////////////////////////////////////////////////////
 # Test Case 5: delete user by id
 def test_delete_user_by_id(test_client):
    # Register a user

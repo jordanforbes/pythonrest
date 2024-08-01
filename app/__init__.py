@@ -14,7 +14,9 @@ def create_app():
 
   app.register_blueprint(main)
 
+  # Import models to register them with SQLAlchemy
   with app.app_context():
+    from .models import User
     db.create_all()
 
   return app
