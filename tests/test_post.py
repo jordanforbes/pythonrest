@@ -27,7 +27,10 @@ def test_create_post(test_client):
   user = User.query.filter_by(username="testuser").first()
   user_id = user.id
 
+  # create post
   response = test_client.post('/api/posts', json={'title':'testtitle','content':'testcontent','user_id': user_id})
   assert response.status_code == 201
   assert response.get_json({"msg": "Post created successfully"})
 
+# //////////////////////////////////////////////////////////////////
+# def test_get_all_posts(test_client):

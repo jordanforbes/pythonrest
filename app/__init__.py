@@ -1,7 +1,7 @@
 # app
 from flask import Flask
 from flask_migrate import Migrate
-from .routes import main
+from .routes import main_bp
 from .extensions import db
 
 migrate = Migrate()

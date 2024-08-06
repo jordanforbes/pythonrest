@@ -1,7 +1,8 @@
 import pytest
-from app import create_app, db
+from app import create_app
 from app.models import User
-# from app.extensions import db
+from app.models import Post
+from app.extensions import db
 
 
 @pytest.fixture(scope='module')
