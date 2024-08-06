@@ -84,7 +84,7 @@ def update_password():
 
 # ////////////////////////////////////
 # delete a user by id
-@user_bp.route('/user/<int:user_id>', methods = ['DELETE'])
+@user_bp.route('/users/<int:user_id>', methods = ['DELETE'])
 def delete_user_by_id(user_id):
   user = User.query.get(user_id)
   if not user:

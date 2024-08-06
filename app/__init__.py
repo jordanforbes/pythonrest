@@ -15,12 +15,4 @@ def create_app():
 
   register_blueprints(app)
 
-  # from .routes import register_blueprints
-  # register_blueprints(app)
-
-  # # Import models to register them with SQLAlchemy
-  # with app.app_context():
-  #   from .models import User, Post
-  #   db.create_all()
-
   return app
