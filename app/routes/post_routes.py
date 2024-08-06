@@ -36,3 +36,29 @@ def get_posts():
   posts = Post.query.all()
   posts_list = [{"id": post.id, "title": post.title, "content": post.content} for post in posts]
   return jsonify(posts_list), 200
+
+# get individual post by id
+@post_bp.route('/posts/<int:post_id>', methods = ['GET'])
+def get_post_by_id(post_id):
+  post = Post.query.get(post_id)
+  if not post:
+    return jsonify({"msg": "Post not found"}), 404
+
+  return jsonify({
+    "id": post.id,
+    "title":post.title,
+    "content":post.content,
+    "user_id":post.user_id
+  }), 200
+
+# delete post by
+@post_bp.route('/posts/<int:post_id>', methods = ['DELETE'])
+def delete_post(post_id):
+  post = Post.query.get(post_id)
+  if not post:
+    return jsonify({"msg":"post not found"}), 404
+
+  db.session.delete(post)
+  db.session.commit()
+
+  return jsonify({"msg":"post successfully deleted"}), 200

@@ -33,4 +33,34 @@ def test_create_post(test_client):
   assert response.get_json({"msg": "Post created successfully"})
 
 # //////////////////////////////////////////////////////////////////
-# def test_get_all_posts(test_client):
+# Test Case 2: can you retrieve all posts?
+def test_get_posts(test_client):
+  response = test_client.get('/api/posts')
+  assert response.status_code == 200
+  data = response.get_json()
+  assert isinstance(data, list)
+
+# //////////////////////////////////////////////////////////////////
+# Test Case 3: can you retrieve one post by id
+def test_get_post_by_id(test_client):
+  post = Post.query.first()
+  post_id = post.id
+
+  response = test_client.get(f'/api/posts/{post_id}')
+  assert response.status_code == 200
+  data = response.get_json()
+  assert data['id'] == post_id
+
+
+# //////////////////////////////////////////////////////////////////
+# Test Case 4: can you delete one post by id
+def test_delete_post_by_id(test_client):
+  post = Post.query.first()
+  post_id = post.id
+
+  response = test_client.delete(f'/api/posts/{post_id}')
+  assert response.status_code == 200
+  assert response.get_json({"msg":"post successfully deleted"})
+
+  post = Post.query.get(post_id)
+  assert post is None
