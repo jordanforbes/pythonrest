@@ -31,7 +31,7 @@ def create_post():
 
 # //////////////////////////////////
 # get all posts
-@post_bp.get('/posts', methods= ['GET'])
+@post_bp.route('/posts', methods= ['GET'])
 def get_posts():
   posts = Post.query.all()
   posts_list = [{"id": post.id, "title": post.title, "content": post.content} for post in posts]
