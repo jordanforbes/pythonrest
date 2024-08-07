@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from flask_login import login_user, logout_user, login_required, current_user
 from ..extensions import db
 from ..models.User import User
 
@@ -94,3 +95,23 @@ def delete_user_by_id(user_id):
   db.session.commit()
 
   return jsonify({"msg" : "user deleted"}), 200
+
+# ////////////////////////////////////
+# login user
+@user_bp.route('/login', methods=['POST'])
+def login():
+  data = request.get_json()
+  username = data.get('username')
+  password = data.get('password')
+
+  user = User.query.filter_by(username=username).first()
+  if user and user.check_password(password):
+    login_user(user)
+    return jsonify({"msg": "Login successful"}), 200
+  return jsonify({"msg": "invalid username or password"}), 401
+
+@user_bp.route('/logout', methods=['POST'])
+@login_required
+def logout():
+  logout_user()
+  return jsonify({"msg":"user logged out"}), 200
