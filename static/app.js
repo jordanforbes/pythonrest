@@ -78,5 +78,52 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Function to fetch the logged-in user
+  async function getUserInfo() {
+    try {
+      const response = await fetch("/api/user_info", {
+        method: "GET",
+        credentials: "include", // Include cookies with the request
+      });
+      if (response.ok) {
+        const data = await response.json();
+        document.getElementById(
+          "username"
+        ).textContent = `Hello, ${data.username}`;
+        document.getElementById("user-info").style.display = "block";
+        document.getElementById("login-info").style.display = "none";
+      } else {
+        document.getElementById("login-info").style.display = "block";
+      }
+    } catch (error) {
+      console.error("Error fetching user info:", error);
+    }
+  }
+
+  // Function to handle logout
+  async function handleLogout() {
+    try {
+      const response = await fetch("/api/logout", {
+        method: "POST",
+        credentials: "include", // Include cookies with the request
+      });
+      if (response.ok) {
+        window.location.href = "/"; // Redirect to homepage or login page
+      } else {
+        console.error("Logout failed");
+      }
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  }
+
+  // Event listener for logout button
+  document
+    .getElementById("logout-button")
+    .addEventListener("click", handleLogout);
+
+  // Fetch user info on page load
+  getUserInfo();
+
   fetchPosts(); // Load posts on page load
 });
