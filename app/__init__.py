@@ -31,7 +31,7 @@ def create_app():
 
   @app.route('/')
   def index():
-    return app.send_static_file('index.html')
+    return app.send_static_file('./index.html')
 
   register_blueprints(app)
   return app
