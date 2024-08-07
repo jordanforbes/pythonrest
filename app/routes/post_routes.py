@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from flask_login import login_required
 from ..extensions import db
 from ..models.Post import Post
 from ..models.User import User
@@ -8,12 +9,12 @@ post_bp = Blueprint('post_bp', __name__)
 # //////////////////////////////////
 # create post
 @post_bp.route('/posts', methods=['POST'])
+@login_required # must be logged in to post
 def create_post():
   data = request.get_json()
-
   title = data.get('title')
   content = data.get('content')
-  user_id = data.get('user_id')
+  user_id = data.get('user_id') #get current logged in user
 
   if not title or not content or not user_id:
     return jsonify({"msg": "invalid title or content or user_id"}), 400

@@ -16,19 +16,35 @@ def test_client():
       yield testing_client
       db.drop_all()
 
-# //////////////////////////////////////////////////////////////////
-# Test Case 1: does Posting work?
-def test_create_post(test_client):
-  # register user
-  response = test_client.post('/api/register', json={'username': 'testuser', 'password':'testpassword'})
-  assert response.status_code == 201
+# Helper function to register and login a user
+def register_and_login(test_client, username, password):
+    # Register the user
+    response = test_client.post('/api/register', json={'username': username, 'password': password})
+    assert response.status_code == 201
 
-  # retrieve user to get user_id
-  user = User.query.filter_by(username="testuser").first()
-  user_id = user.id
+    # Login the user
+    response = test_client.post('/api/login', json={'username': username, 'password': password})
+    assert response.status_code == 200
+
+    # Extract the token from the login response
+    token = response.get_json()['token']
+    return token
+
+# //////////////////////////////////////////////////////////////////
+# Test Case 1: does Posting work after login?
+def test_create_post(test_client):
+  # register and login user to get token
+  token = register_and_login(test_client, "testuser","testpassword")
+
+
+  # # retrieve user to get user_id
+  # user = User.query.filter_by(username="testuser").first()
+  # user_id = user.id
 
   # create post
-  response = test_client.post('/api/posts', json={'title':'testtitle','content':'testcontent','user_id': user_id})
+  response = test_client.post('/api/posts',
+                              json={'title':'testtitle','content':'testcontent'},
+                              headers={'Authorization':f'Bearer {token}'})
   assert response.status_code == 201
   assert response.get_json({"msg": "Post created successfully"})
 
