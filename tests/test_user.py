@@ -17,6 +17,20 @@ def test_client():
       yield testing_client
       db.drop_all()
 
+# Helper function to register and login a user
+def register_and_login(test_client, username, password):
+    # Register the user
+    response = test_client.post('/api/register', json={'username': username, 'password': password})
+    assert response.status_code == 201
+
+    # Login the user
+    response = test_client.post('/api/login', json={'username': username, 'password': password})
+    assert response.status_code == 200
+
+    # Extract the token from the login response
+    token = response.get_json()['token']
+    return token
+
 # //////////////////////////////////////////////////////////////////
 # Test Case 1: does registration work?
 def test_register(test_client):
@@ -107,18 +121,22 @@ def test_get_user_by_id(test_client):
 # //////////////////////////////////////////////////////////////////
 # Test Case 5: delete user by id
 def test_delete_user_by_id(test_client):
-   # Register a user
-    response = test_client.post('/api/register', json={'username': 'testuser1', 'password': 'testpassword1'})
-    assert response.status_code == 201
+  # Register a user
+  token = register_and_login(test_client, 'testuser1', 'testpassword1')
 
-    # Fetch the user by username to get the user ID
-    user = User.query.filter_by(username='testuser1').first()
-    user_id = user.id
+  # fetch user to get user id
+  user = User.query.filter_by(username='testuser1').first()
+  assert user is not None
+  user_id = user.id
 
-    # delete user
-    delete_response = test_client.delete(f'/api/user/{user_id}')
-    assert delete_response.status_code == 200
-    assert delete_response.get_json({"msg":"user deleted"})
+  # delete user with authorization
+  delete_response = test_client.delete(
+    f'/api/users/{user_id}',
+    headers = {'Authorization':f'Bearer {token}'}
+  )
 
-    deleted_user = User.query.get(user_id)
-    assert deleted_user is None
+  assert delete_response.status_code == 200
+  assert delete_response.get_json() == {"msg":"user deleted"}
+
+  deleted_user = User.query.filter_by(username='testuser1').first()
+  assert deleted_user is None

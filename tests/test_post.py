@@ -38,12 +38,13 @@ def test_create_post(test_client):
 
 
   # # retrieve user to get user_id
-  # user = User.query.filter_by(username="testuser").first()
-  # user_id = user.id
+  user = User.query.filter_by(username="testuser").first()
+  assert user is not None
+  user_id = user.id
 
   # create post
   response = test_client.post('/api/posts',
-                              json={'title':'testtitle','content':'testcontent'},
+                              json={'title':'testtitle','content':'testcontent', 'user_id':user_id},
                               headers={'Authorization':f'Bearer {token}'})
   assert response.status_code == 201
   assert response.get_json({"msg": "Post created successfully"})

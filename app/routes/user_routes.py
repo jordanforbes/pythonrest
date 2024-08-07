@@ -31,23 +31,26 @@ def register():
 
 # ////////////////////////////////////
 # login user
-@user_bp.route('/login', methods=['POST'])
-def login():
-  data = request.get_json()
-  username = data.get('username')
-  password = data.get('password')
+# @user_bp.route('/login', methods=['POST'])
+# def login():
+#   data = request.get_json()
+#   username = data.get('username')
+#   password = data.get('password')
 
-  user = User.query.filter_by(username=username).first()
-  if user and user.check_password(password):
-    token = create_access_token(identity=user.id)
-    return jsonify(token=token), 200
-  return jsonify({"msg": "invalid username or password"}), 401
+#   user = User.query.filter_by(username=username).first()
+#   if user and user.check_password(password):
+#     login_user(user)
+#     # token = create_access_token(identity=user.id)
+#     # return jsonify(token=token), 200
+#     return jsonify({"token": "fake-jwt-token"}), 200  # Replace with actual token generation
 
-@user_bp.route('/logout', methods=['POST'])
-@login_required # must be logged in to logout of course
-def logout():
-  logout_user()
-  return jsonify({"msg":"user logged out"}), 200
+#   return jsonify({"msg": "invalid username or password"}), 401
+
+# @user_bp.route('/logout', methods=['POST'])
+# @login_required # must be logged in to logout of course
+# def logout():
+#   logout_user()
+#   return jsonify({"msg":"user logged out"}), 200
 
 
 # ////////////////////////////////////
