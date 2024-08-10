@@ -16,6 +16,7 @@ def register():
 
   username = data.get('username')
   password = data.get('password')
+  print(username)
 
   if not username or not password:
     return jsonify({"msg": "Missing username or password"}), 400

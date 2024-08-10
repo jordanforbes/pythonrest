@@ -5,7 +5,7 @@ from app.models import Post
 from app.extensions import db
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope='function')
 def test_client():
   app = create_app()
   app.config['TESTING'] = True
@@ -15,6 +15,7 @@ def test_client():
     with app.app_context():
       db.create_all()
       yield testing_client
+      db.session.remove()
       db.drop_all()
 
 # Helper function to register and login a user
@@ -38,6 +39,23 @@ def test_register(test_client):
 
   assert response.status_code == 201
   assert response.get_json() == {"msg":"User registered"}
+
+# //////////////////////////////////////////////////////////////////
+# Test Case 1.1: registration fails if user already exists
+def test_no_duplicate_users(test_client):
+  # create first user
+  response= test_client.post('/api/register', json={'username': 'testuser', 'password':'testpassword'})
+
+  # make sure first user is registered correctly
+  assert response.status_code == 201
+  assert response.get_json() == {"msg":"User registered"}
+
+  # create duplicate user
+  response = test_client.post('/api/register', json={'username': 'testuser', 'password':'testpassword'})
+
+  # make sure duplicate is not saved
+  assert response.status_code == 400
+  assert response.get_json() == {"msg":"Username already exists"}
 
 # //////////////////////////////////////////////////////////////////
 # Test Case 2: can all users be returned?

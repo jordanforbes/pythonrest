@@ -14,6 +14,7 @@ def test_client():
     with app.app_context():
       db.create_all()
       yield testing_client
+      db.session.remove()
       db.drop_all()
 
 # Helper function to register and login a user
@@ -52,6 +53,7 @@ def test_create_post(test_client):
 # //////////////////////////////////////////////////////////////////
 # Test Case 2: can you retrieve all posts?
 def test_get_posts(test_client):
+
   response = test_client.get('/api/posts')
   assert response.status_code == 200
   data = response.get_json()
@@ -60,6 +62,7 @@ def test_get_posts(test_client):
 # //////////////////////////////////////////////////////////////////
 # Test Case 3: can you retrieve one post by id
 def test_get_post_by_id(test_client):
+
   post = Post.query.first()
   post_id = post.id
 
@@ -72,6 +75,7 @@ def test_get_post_by_id(test_client):
 # //////////////////////////////////////////////////////////////////
 # Test Case 4: can you delete one post by id
 def test_delete_post_by_id(test_client):
+
   post = Post.query.first()
   post_id = post.id
 
