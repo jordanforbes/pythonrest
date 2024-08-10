@@ -1,5 +1,7 @@
 // static/app.js
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("loaded");
+
   const registerForm = document.getElementById("register-form");
   const loginForm = document.getElementById("login-form");
   const postForm = document.getElementById("post-form");
@@ -21,6 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("Registration successful");
     } else {
       alert("Registration failed");
+      console.log("registration failed");
     }
   });
 
@@ -39,6 +42,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await response.json();
       authToken = data.token;
       alert("Login successful");
+      console.log("login successful");
+      console.log(data);
     } else {
       alert("Login failed");
     }
@@ -59,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     if (response.ok) {
-      alert("Post created successfully");
+      alert(`Post created successfully: ${title} : ${content}`);
       fetchPosts(); // Refresh posts list
     } else {
       alert("Post creation failed");
@@ -87,11 +92,12 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       if (response.ok) {
         const data = await response.json();
-        document.getElementById(
-          "username"
-        ).textContent = `Hello, ${data.username}`;
+        document.getElementById("username").textContent = data.username
+          ? `Hello, ${data.username}`
+          : "logged out";
         document.getElementById("user-info").style.display = "block";
         document.getElementById("login-info").style.display = "none";
+        console.log(data.username);
       } else {
         document.getElementById("login-info").style.display = "block";
       }
