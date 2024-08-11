@@ -7,13 +7,14 @@ from .extensions import db, login_manager
 # from flask_login import LoginManager
 from .models import User
 from flask_jwt_extended import JWTManager
+# import jwt
 
 
 migrate = Migrate()
 jwt=JWTManager()
 
 def create_app():
-  app = Flask(__name__, static_folder = "../static")
+  app = Flask(__name__)
   CORS(app)
   app.config.from_object('app.config.Config')
 
@@ -33,7 +34,7 @@ def create_app():
 
   @app.route('/')
   def index():
-    return app.send_static_file('./index.html')
+    return app
 
   register_blueprints(app)
   return app
